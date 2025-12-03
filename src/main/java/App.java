@@ -21,23 +21,28 @@ public class App {
 
         String url = "jdbc:mysql://localhost:3306/sakila";
 
-        //new data source object
-        BasicDataSource dataSource = new BasicDataSource();
 
-        //setting the url, password, username
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
+        try (
+                //new data source object
+                BasicDataSource dataSource = new BasicDataSource()
+        ) {
 
-        try (Connection connection = dataSource.getConnection()) {
-            menuOptions(connection);
+            //setting the url, password, username
+            dataSource.setUrl(url);
+            dataSource.setUsername(username);
+            dataSource.setPassword(password);
+
+            menuOptions(dataSource);
         } catch (SQLException e) {
-            System.out.println("An error has occurred" + " " + e.getMessage());
+            System.out.println("Error woopsie" + e.getMessage());
         }
+
+
     }
 
-    public static void menuOptions(Connection connection) {
+    public static void menuOptions(BasicDataSource basicDataSource) {
         boolean run = true;
+
         while (run) {
             System.out.println("What would you like to do");
             System.out.println("""
@@ -50,10 +55,10 @@ public class App {
 
             switch (menuChoice) {
                 case 1:
-                    lastNameSearch(connection);
+                    lastNameSearch(basicDataSource);
                     break;
                 case 2:
-                    fullNameSearch(connection);
+                    fullNameSearch(basicDataSource);
                     break;
                 case 0:
                     run = false;
@@ -62,13 +67,16 @@ public class App {
         }
     }
 
-    public static void lastNameSearch(Connection connection) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("""
-                SELECT first_name,
-                last_name
-                FROM actor
-                WHERE last_name = ?;
-                """)) {
+    public static void lastNameSearch(BasicDataSource basicDataSource) {
+        try (
+                Connection connection = basicDataSource.getConnection();
+
+                PreparedStatement preparedStatement = connection.prepareStatement("""
+                        SELECT first_name,
+                        last_name
+                        FROM actor
+                        WHERE last_name = ?;
+                        """)) {
             System.out.println("Enter the last name of your favorite actor:");
             String lastName = scanner.nextLine().toUpperCase().trim();
             preparedStatement.setString(1, lastName);
@@ -82,13 +90,16 @@ public class App {
         }
     }
 
-    public static void fullNameSearch(Connection connection) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("""
-                SELECT first_name,
-                last_name
-                FROM actor
-                WHERE first_name = ? AND last_name = ?;
-                """)) {
+    public static void fullNameSearch(BasicDataSource basicDataSource) {
+        try (
+                Connection connection = basicDataSource.getConnection();
+
+                PreparedStatement preparedStatement = connection.prepareStatement("""
+                        SELECT first_name,
+                        last_name
+                        FROM actor
+                        WHERE first_name = ? AND last_name = ?;
+                        """)) {
             System.out.println("Enter the first name:");
             String firstName = scanner.nextLine().toUpperCase().trim();
 
@@ -112,7 +123,7 @@ public class App {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
             //bool for handling no matches
-            boolean any = true;
+            boolean any = false;
 
             //result set starts before first row, therefore need next
             while (resultSet.next()) {
