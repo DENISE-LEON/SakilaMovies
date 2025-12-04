@@ -75,8 +75,8 @@ public class App {
                 Connection connection = basicDataSource.getConnection();
 
                 PreparedStatement preparedStatement = connection.prepareStatement("""
-                        SELECT first_name,
-                        last_name
+                        SELECT first_name AS "First Name",
+                        last_name AS "Last Name"
                         FROM actor
                         WHERE last_name = ?;
                         """)) {
@@ -168,7 +168,8 @@ public class App {
             while (resultSet.next()) {
                 any = true;
                 for (int i = 1; i <= columnCount; i++) {
-                    String columnName = metaData.getColumnName(i);
+                    //use column label to display using the alias
+                    String columnName = metaData.getColumnLabel(i);
 
                     String value = resultSet.getString(i);
                     System.out.printf("%-15s: %-20s%n", columnName, value);
