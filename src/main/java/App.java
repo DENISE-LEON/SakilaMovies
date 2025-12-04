@@ -7,8 +7,6 @@ public class App {
     public static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-
-
         //password username check
         if (args.length != 2) {
             System.out.println("Application needs two args to run: A username and a password for the db");
@@ -20,6 +18,7 @@ public class App {
         //username and password from args
         String username = args[0];
         String password = args[1];
+
         String url = "jdbc:mysql://localhost:3306/sakila";
 
 
@@ -27,74 +26,174 @@ public class App {
                 //new data source object
                 BasicDataSource dataSource = new BasicDataSource()
         ) {
+
             //setting the url, password, username
             dataSource.setUrl(url);
             dataSource.setUsername(username);
             dataSource.setPassword(password);
 
-            //display the menu
-            //ui works bc the data source(which has all necessary info) is passed into the ui
-            UserInterface ui = new UserInterface(dataSource);
-            ui.menuOptions();
+            menuOptions(dataSource);
         } catch (SQLException e) {
             System.out.println("Error woopsie" + e.getMessage());
         }
 
+
+    }
+
+    public static void menuOptions(BasicDataSource basicDataSource) {
+        boolean run = true;
+
+        while (run) {
+            try {
+                System.out.println("What would you like to do");
+                System.out.println("""
+                        1) Last name actor search
+                        2) Full name actor search
+                        3) Find films actor has been in
+                        0) Exit
+                        """);
+                int menuChoice = scanner.nextInt();
+                //if there is bad input this is skipped and the catch is run, which is y a scanner.nextLine is needed in catch
+                scanner.nextLine();
+
+                switch (menuChoice) {
+                    case 1:
+                        lastNameSearch(basicDataSource);
+                        break;
+                    case 2:
+                        fullNameSearch(basicDataSource);
+                        break;
+                    case 3:
+                        filmsActorIn(basicDataSource);
+                        break;
+                    case 0:
+                        run = false;
+                        break;
+                }
+            }catch (Exception e) {
+                System.out.println("Please input the number that matches what you would like to do");
+                System.out.println("Example:");
+                System.out.println("I want to: 1)Last name actor search");
+                System.out.println("My input should be: 1");
+                //need to clear buffer bc bad input is still in the buffer
+                scanner.nextLine();
+            }
+        }
+    }
+
+    public static void lastNameSearch(BasicDataSource basicDataSource) {
+        try (
+                Connection connection = basicDataSource.getConnection();
+
+                PreparedStatement preparedStatement = connection.prepareStatement("""
+                        SELECT first_name,
+                        last_name
+                        FROM actor
+                        WHERE last_name = ?;
+                        """)) {
+            System.out.println("Enter the last name of your favorite actor:");
+            String lastName = scanner.nextLine().trim();
+            preparedStatement.setString(1, lastName);
+
+            try (ResultSet set = preparedStatement.executeQuery()
+            ) {
+                printResults(set);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error" + e.getMessage());
+        }
+    }
+
+    public static void fullNameSearch(BasicDataSource basicDataSource) {
+        try (
+                Connection connection = basicDataSource.getConnection();
+
+                PreparedStatement preparedStatement = connection.prepareStatement("""
+                        SELECT first_name,
+                        last_name
+                        FROM actor
+                        WHERE first_name = ? AND last_name = ?;
+                        """)) {
+            System.out.println("Enter the first name:");
+            String firstName = scanner.nextLine().toUpperCase().trim();
+
+            System.out.println("Enter the last name:");
+            String lastName = scanner.nextLine().toUpperCase().trim();
+
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
+
+            try (ResultSet set = preparedStatement.executeQuery()
+            ) {
+                printResults(set);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error" + " " + e.getMessage());
+        }
+    }
+
+    public static void filmsActorIn(BasicDataSource basicDataSource) {
+        try (
+                Connection connection = basicDataSource.getConnection();
+
+                PreparedStatement preparedStatement = connection.prepareStatement("""
+                        SELECT f.film_id,
+                        title,
+                        description,
+                        release_year,
+                        first_name
+                        FROM film f
+                        JOIN film_actor fa ON f.film_id = fa.film_id
+                        JOIN actor a ON fa.actor_id = a.actor_id
+                        WHERE first_name = ? AND last_name = ?;
+                        """)
+                ) {
+            System.out.println("Enter the first name:");
+            String firstName = scanner.nextLine().toUpperCase().trim();
+
+            System.out.println("Enter the last name:");
+            String lastName = scanner.nextLine().toUpperCase().trim();
+
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
+
+            try (ResultSet set = preparedStatement.executeQuery()
+            ) {
+                printResults(set);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("error" + " " + e.getMessage());
+        }
+    }
+
+
+    public static void printResults(ResultSet resultSet) {
+        try {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            //bool for handling no matches
+            boolean any = false;
+
+            //result set starts before first row, therefore need next
+            while (resultSet.next()) {
+                any = true;
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnName(i);
+
+                    String value = resultSet.getString(i);
+                    System.out.printf("%-15s: %-20s%n", columnName, value);
+                }
+
+                //print an empty line to make the results prettier
+                System.out.println("--------------------------------");
+            }
+            if (!any) {
+                System.out.println("No matches found");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error" + " " + e.getMessage());
+        }
     }
 }
-
-
-//    public static void lastNameSearch(BasicDataSource basicDataSource) {
-//        try (
-//                Connection connection = basicDataSource.getConnection();
-//
-//                PreparedStatement preparedStatement = connection.prepareStatement("""
-//                        SELECT first_name,
-//                        last_name
-//                        FROM actor
-//                        WHERE last_name = ?;
-//                        """)) {
-//            System.out.println("Enter the last name of your favorite actor:");
-//            String lastName = scanner.nextLine().toUpperCase().trim();
-//            preparedStatement.setString(1, lastName);
-//
-//            try (ResultSet set = preparedStatement.executeQuery()
-//            ) {
-//                printResults(set);
-//            }
-//        } catch (SQLException e) {
-//            System.out.println("Error" + e.getMessage());
-//        }
-//    }
-//
-
-//
-//    public static void printResults(ResultSet resultSet) {
-//        try {
-//            ResultSetMetaData metaData = resultSet.getMetaData();
-//            int columnCount = metaData.getColumnCount();
-//            //bool for handling no matches
-//            boolean any = false;
-//
-//            //result set starts before first row, therefore need next
-//            while (resultSet.next()) {
-//                any = true;
-//                for (int i = 1; i <= columnCount; i++) {
-//                    String columnName = metaData.getColumnName(i);
-//
-//                    String value = resultSet.getString(i);
-//                    System.out.printf("%-15s: %-20s%n", columnName, value);
-//                }
-//
-//                //print an empty line to make the results prettier
-//                System.out.println("--------------------------------");
-//            }
-//            if (!any) {
-//                System.out.println("No matches found");
-//            }
-//
-//        } catch (SQLException e) {
-//            System.out.println("Error" + " " + e.getMessage());
-//        }
-//    }
-//}
