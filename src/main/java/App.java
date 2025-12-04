@@ -33,6 +33,7 @@ public class App {
             dataSource.setPassword(password);
 
             //display the menu
+            //ui works bc the data source(which has all necessary info) is passed into the ui
             UserInterface ui = new UserInterface(dataSource);
             ui.menuOptions();
         } catch (SQLException e) {
@@ -41,7 +42,6 @@ public class App {
 
     }
 }
-
 
 
 //    public static void lastNameSearch(BasicDataSource basicDataSource) {
@@ -67,33 +67,7 @@ public class App {
 //        }
 //    }
 //
-//    public static void fullNameSearch(BasicDataSource basicDataSource) {
-//        try (
-//                Connection connection = basicDataSource.getConnection();
-//
-//                PreparedStatement preparedStatement = connection.prepareStatement("""
-//                        SELECT first_name,
-//                        last_name
-//                        FROM actor
-//                        WHERE first_name = ? AND last_name = ?;
-//                        """)) {
-//            System.out.println("Enter the first name:");
-//            String firstName = scanner.nextLine().toUpperCase().trim();
-//
-//            System.out.println("Enter the last name:");
-//            String lastName = scanner.nextLine().toUpperCase().trim();
-//
-//            preparedStatement.setString(1, firstName);
-//            preparedStatement.setString(2, lastName);
-//
-//            try (ResultSet set = preparedStatement.executeQuery()
-//            ) {
-//                printResults(set);
-//            }
-//        } catch (SQLException e) {
-//            System.out.println("Error" + " " + e.getMessage());
-//        }
-//    }
+
 //
 //    public static void printResults(ResultSet resultSet) {
 //        try {
