@@ -1,14 +1,15 @@
 import java.time.LocalDateTime;
 import java.util.Date;
 
+
 public class Film {
     private int filmID;
     private String title;
     private String description;
-    private Date year;
+    private int year;
     private int length;
 
-    public Film(int filmID, String title, String description, Date year, int length) {
+    public Film(int filmID, String title, String description, int year, int length) {
         this.filmID = filmID;
         this.title = title;
         this.description = description;
@@ -40,11 +41,11 @@ public class Film {
         this.description = description;
     }
 
-    public Date getYear() {
+    public int getYear() {
         return year;
     }
 
-    public void setYear(Date year) {
+    public void setYear(int year) {
         this.year = year;
     }
 

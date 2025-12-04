@@ -1,4 +1,5 @@
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ public class FilmManager {
     public List<Film> getAllFilms() {
         List<Film> allFilms = new ArrayList<>();
         try(
-
+                Connection
                 ) {
 
         }
