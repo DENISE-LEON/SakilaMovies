@@ -26,12 +26,11 @@ public class UserInterface {
                         3) Actor ID search
                         4) View all films
                         5) Find film using Film ID
-                        6)Find film using actor ID
+                        6) Find film using actor ID
                         0) Exit
                         """);
                 int menuChoice = scanner.nextInt();
                 scanner.nextLine();
-
                 switch (menuChoice) {
                     case 1:
                         getAllActorsProcess();
@@ -52,6 +51,9 @@ public class UserInterface {
                         filmActorIDSearch();
                         break;
                     case 0:
+                        System.out.print("Exiting");
+                        loadingDots();
+                        System.out.println("\nGoodbye!");
                         run = false;
                         break;
                 }
@@ -66,8 +68,9 @@ public class UserInterface {
         }
     }
 
-    //figure out perams later
+
     public void getAllActorsProcess() {
+        nowDisplayingMgs("all actors");
         printActors(actorManager.getAllActors());
     }
 
@@ -79,6 +82,7 @@ public class UserInterface {
         String lastName = scanner.nextLine().toUpperCase().trim();
 
         List<Actor> actors = actorManager.getByFullName(firstName, lastName);
+        nowDisplayingMgs("actors who's names are:" + " " + firstName + " " + lastName);
         printActors(actors);
 
 
@@ -90,6 +94,7 @@ public class UserInterface {
             int actorID = scanner.nextInt();
             scanner.nextLine();
             List<Actor> actors = actorManager.getActorByID(actorID);
+            nowDisplayingMgs("actors with actor ID:" + " " + actorID);
             printActors(actors);
         } catch (Exception e) {
             System.out.println("Please input a number");
@@ -101,6 +106,7 @@ public class UserInterface {
     }
 
     public void allFilmsProcess() {
+        nowDisplayingMgs("all films");
         printFilms(filmManager.getAllFilms());
     }
 
@@ -111,6 +117,7 @@ public class UserInterface {
             int filmID = scanner.nextInt();
             scanner.nextLine();
             List<Film> films = filmManager.getFilmByID(filmID);
+            nowDisplayingMgs("films with film ID:" + " " + filmID);
             printFilms(films);
         } catch (Exception e) {
             System.out.println("Please input a number");
@@ -127,6 +134,7 @@ public class UserInterface {
             int actorID = scanner.nextInt();
             scanner.nextLine();
             List<Film> films = filmManager.getFilmByActorID(actorID);
+            nowDisplayingMgs("films where actor ID is:" + " " + actorID);
             printFilms(films);
         } catch (Exception e) {
             System.out.println("Please input a number");
@@ -186,7 +194,7 @@ public class UserInterface {
         System.out.println(bottom);
     }
 
-    public static void printFilms(List<Film> films) {
+    public void printFilms(List<Film> films) {
         if (films.isEmpty()) {
             System.out.println("No films found.");
             System.out.println();
@@ -218,4 +226,24 @@ public class UserInterface {
     }
 
     //add method or code that says now displaying...
+    public void nowDisplayingMgs(String what) {
+        System.out.print("Searching");
+        loadingDots();
+        System.out.println();
+        System.out.print("Now displaying " + what);
+        loadingDots();
+        System.out.println();
+
+    }
+
+    public void loadingDots() {
+        try {
+            for (int i = 0; i < 4; i++) {
+                Thread.sleep(500);
+                System.out.print(".");
+            }
+        } catch (InterruptedException e) {
+            // ignore
+        }
+    }
 }
