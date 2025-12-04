@@ -36,6 +36,36 @@ public class FilmManager {
         return allFilms;
     }
 
+
+    public List<Film> getFilmByID(int filmID) {
+        List<Film> filmsByID = new ArrayList<>();
+        try(
+               Connection connection = dataSource.getConnection();
+
+               PreparedStatement preparedStatement = connection.prepareStatement("""
+                       SELECT film_id, title,
+                        description, release_year,
+                        length
+                        FROM film
+                        WHERE film_id = ?
+                       """)
+                ) {
+            preparedStatement.setInt(1, filmID);
+
+            try(
+                   ResultSet resultSet = preparedStatement.executeQuery()
+                    ) {
+                addFilmToList(resultSet, filmsByID);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("An oopise" + " " + e.getMessage());
+        }
+
+        return filmsByID;
+    }
+
+
     public List<Film> getFilmByActorID(int actorID) {
         List<Film> filmsByActID = new ArrayList<>();
 
@@ -65,12 +95,6 @@ public class FilmManager {
     }
 
 
-
-    public List<Film> getFilmByID(int filmID) {
-        List<Film> filmsByID = new ArrayList<>();
-
-        return filmsByID;
-    }
 
     public void addFilmToList(ResultSet resultSet, List<Film> list) throws SQLException {
 

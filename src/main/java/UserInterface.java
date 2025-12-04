@@ -144,15 +144,46 @@ public class UserInterface {
             return;
         }
 
-        System.out.printf("%-5s %-15s %-15s%n", "ID", "First Name", "Last Name");
-        System.out.println("----------------------------------------");
+        int idWidth = 4;
+        int firstWidth = 15;
+        int lastWidth = 15;
+
+        String top =
+                "╔" + "═".repeat(idWidth + 2) +
+                        "╦" + "═".repeat(firstWidth + 2) +
+                        "╦" + "═".repeat(lastWidth + 2) +
+                        "╗";
+
+        String header = String.format(
+                "║ %-" + idWidth + "s ║ %-" + firstWidth + "s ║ %-" + lastWidth + "s ║",
+                "ID", "First Name", "Last Name"
+        );
+
+        String mid =
+                "╠" + "═".repeat(idWidth + 2) +
+                        "╬" + "═".repeat(firstWidth + 2) +
+                        "╬" + "═".repeat(lastWidth + 2) +
+                        "╣";
+
+        String bottom =
+                "╚" + "═".repeat(idWidth + 2) +
+                        "╩" + "═".repeat(firstWidth + 2) +
+                        "╩" + "═".repeat(lastWidth + 2) +
+                        "╝";
+
+        System.out.println(top);
+        System.out.println(header);
+        System.out.println(mid);
 
         for (Actor actor : actors) {
-            System.out.printf("%-5d %-15s %-15s%n",
+            System.out.printf(
+                    "║ %-" + idWidth + "d ║ %-" + firstWidth + "s ║ %-" + lastWidth + "s ║%n",
                     actor.getActorID(),
                     actor.getFirstName(),
-                    actor.getLastName());
+                    actor.getLastName()
+            );
         }
+        System.out.println(bottom);
     }
 
     public static void printFilms(List<Film> films) {
