@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ActorManager {
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     public ActorManager(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -81,7 +81,7 @@ public class ActorManager {
             preparedStatement.setInt(1,actorID);
 
             try (
-                    ResultSet resultSet = preparedStatement.executeQuery();
+                    ResultSet resultSet = preparedStatement.executeQuery()
                     ) {
                 addActorToList(resultSet,actorsByID);
             }

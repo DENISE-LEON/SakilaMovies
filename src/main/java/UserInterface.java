@@ -101,11 +101,24 @@ public class UserInterface {
     }
 
     public void allFilmsProcess() {
-
+        printFilms(filmManager.getAllFilms());
     }
 
     public void filmIDSearchProcess() {
 
+        try {
+            System.out.println("Please enter the Film ID of the film you'd like to find");
+            int filmID = scanner.nextInt();
+            scanner.nextLine();
+            List<Film> films = filmManager.getFilmByID(filmID);
+            printFilms(films);
+        } catch (Exception e) {
+            System.out.println("Please input a number");
+            System.out.println("Example:");
+            System.out.println("I want to: find film with film id 3");
+            System.out.println("Your input: 3");
+            scanner.nextLine();
+        }
     }
 
     public void filmActorIDSearch() {
@@ -115,6 +128,7 @@ public class UserInterface {
     public static void printActors(List<Actor> actors) {
         if (actors.isEmpty()) {
             System.out.println("No actors found.");
+            System.out.println();
             return;
         }
 
@@ -129,5 +143,21 @@ public class UserInterface {
         }
     }
 
+    public static void printFilms(List<Film> films) {
+        if (films.isEmpty()) {
+            System.out.println("No films found.");
+            System.out.println();
+            return;
+        }
 
+        System.out.printf("%-5s %-15s %-15s%n", "ID", "Title", "Description");
+        System.out.println("----------------------------------------");
+
+        for (Film film : films) {
+            System.out.printf("%-5d %-15s %-15s%n",
+                    film.getFilmID(),
+                    film.getTitle(),
+                    film.getDescription());
+        }
+    }
 }
