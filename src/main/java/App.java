@@ -48,6 +48,7 @@ public class App {
             System.out.println("""
                     1) Last name actor search
                     2) Full name actor search
+                  
                     0) Exit
                     """);
             int menuChoice = scanner.nextInt();
@@ -117,6 +118,7 @@ public class App {
             System.out.println("Error" + " " + e.getMessage());
         }
     }
+
 
     public static void printResults(ResultSet resultSet) {
         try {
