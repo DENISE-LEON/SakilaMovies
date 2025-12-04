@@ -122,7 +122,19 @@ public class UserInterface {
     }
 
     public void filmActorIDSearch() {
-
+        try {
+            System.out.println("Please enter the Actor ID for the film you'd like to find");
+            int actorID = scanner.nextInt();
+            scanner.nextLine();
+            List<Film> films = filmManager.getFilmByActorID(actorID);
+            printFilms(films);
+        } catch (Exception e) {
+            System.out.println("Please input a number");
+            System.out.println("Example:");
+            System.out.println("I want to: find film with actor id 3");
+            System.out.println("Your input: 3");
+            scanner.nextLine();
+        }
     }
 
     public static void printActors(List<Actor> actors) {
@@ -150,14 +162,29 @@ public class UserInterface {
             return;
         }
 
-        System.out.printf("%-5s %-15s %-15s%n", "ID", "Title", "Description");
-        System.out.println("----------------------------------------");
+        int idWidth = 4;
+        int titleWidth = 30;
+        int descWidth = 130;
+
+        String top = "╔" + "═".repeat(idWidth + 2) + "╦" + "═".repeat(titleWidth + 2) + "╦" + "═".repeat(descWidth + 2) + "╗";
+        String header = String.format("║ %-" + idWidth + "s ║ %-" + titleWidth + "s ║ %-" + descWidth + "s ║",
+                "ID", "Title", "Description");
+        String mid = "╠" + "═".repeat(idWidth + 2) + "╬" + "═".repeat(titleWidth + 2) + "╬" + "═".repeat(descWidth + 2) + "╣";
+        String bottom = "╚" + "═".repeat(idWidth + 2) + "╩" + "═".repeat(titleWidth + 2) + "╩" + "═".repeat(descWidth + 2) + "╝";
+
+        System.out.println(top);
+        System.out.println(header);
+        System.out.println(mid);
 
         for (Film film : films) {
-            System.out.printf("%-5d %-15s %-15s%n",
+            System.out.printf("║ %-" + idWidth + "d ║ %-" + titleWidth + "s ║ %-" + descWidth + "s ║%n",
                     film.getFilmID(),
                     film.getTitle(),
                     film.getDescription());
         }
+
+        System.out.println(bottom);
     }
+
+    //add method or code that says now displaying...
 }

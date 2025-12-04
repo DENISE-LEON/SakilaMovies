@@ -3,13 +3,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class FilmManager {
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     public FilmManager(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -32,17 +30,37 @@ public class FilmManager {
                     ) {
                 addFilmToList(resultSet, allFilms);
             }
-
         } catch (SQLException e) {
             System.out.println("An error has occurred" + " " + e.getMessage());
         }
         return allFilms;
-
     }
 
-    public List<Film> filmByActorID(int actorID) {
+    public List<Film> getFilmByActorID(int actorID) {
         List<Film> filmsByActID = new ArrayList<>();
 
+        try(
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement("""
+                     SELECT f.film_id, title,
+                     description, release_year,
+                     length
+                     FROM film f
+                     JOIN film_actor fa ON f.film_id = fa.film_id
+                     JOIN actor a ON fa.actor_id = a.actor_id
+                     WHERE a.actor_id = ?;
+                    """)
+                ) {
+            preparedStatement.setInt(1, actorID);
+
+            try(
+                    ResultSet resultSet = preparedStatement.executeQuery()
+                    ) {
+                addFilmToList(resultSet, filmsByActID);
+            }
+        } catch (SQLException e) {
+            System.out.println("An error" + " " + e.getMessage());
+        }
         return filmsByActID;
     }
 
