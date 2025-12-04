@@ -48,7 +48,7 @@ public class App {
             System.out.println("""
                     1) Last name actor search
                     2) Full name actor search
-                  
+                    3) Find films actor has been in
                     0) Exit
                     """);
             int menuChoice = scanner.nextInt();
@@ -61,6 +61,8 @@ public class App {
                 case 2:
                     fullNameSearch(basicDataSource);
                     break;
+                case 3:
+                    filmsActorIn(basicDataSource);
                 case 0:
                     run = false;
                     break;
@@ -116,6 +118,41 @@ public class App {
             }
         } catch (SQLException e) {
             System.out.println("Error" + " " + e.getMessage());
+        }
+    }
+
+    public static void filmsActorIn(BasicDataSource basicDataSource) {
+        try (
+                Connection connection = basicDataSource.getConnection();
+
+                PreparedStatement preparedStatement = connection.prepareStatement("""
+                        SELECT f.film_id,
+                        title,
+                        description,
+                        release_year,
+                        first_name
+                        FROM film f
+                        JOIN film_actor fa ON f.film_id = fa.film_id
+                        JOIN actor a ON fa.actor_id = a.actor_id
+                        WHERE first_name = ? AND last_name = ?;
+                        """)
+                ) {
+            System.out.println("Enter the first name:");
+            String firstName = scanner.nextLine().toUpperCase().trim();
+
+            System.out.println("Enter the last name:");
+            String lastName = scanner.nextLine().toUpperCase().trim();
+
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
+
+            try (ResultSet set = preparedStatement.executeQuery()
+            ) {
+                printResults(set);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("error" + " " + e.getMessage());
         }
     }
 
